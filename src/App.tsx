@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { BsArrowDownUp } from 'react-icons/bs';
 
 import { getCurrenciesList, getLatestRates } from './services/currency';
 
@@ -10,6 +11,11 @@ export default function App() {
 
   const currencies = useQuery({ queryKey: ['currencies'], queryFn: () => getCurrenciesList() });
   const rates = useQuery({ queryKey: ['rates'], queryFn: () => getLatestRates(from) });
+
+  const swapCurrencies = () => {
+    setFrom(to);
+    setTo(from);
+  };
 
   useEffect(() => {
     rates.refetch();
@@ -47,6 +53,7 @@ export default function App() {
           value={from}
           onChange={(e) => setFrom(e.target.value)}
         >
+          {currencies.isLoading && <option>Loading...</option>}
           {currencies.data?.map((currency) => (
             <option key={currency.code} value={currency.code}>
               {currency.name}
@@ -54,6 +61,9 @@ export default function App() {
           ))}
         </select>
       </section>
+      <abbr className="self-center my-4" title="Swap currencies" onClick={swapCurrencies}>
+        <BsArrowDownUp className="text-2xl font-medium cursor-pointer" />
+      </abbr>
       <section className="flex flex-col mb-8">
         <label className="font-medium mb-2" htmlFor="to">
           To Currency:
@@ -64,6 +74,7 @@ export default function App() {
           value={to}
           onChange={(e) => setTo(e.target.value)}
         >
+          {currencies.isLoading && <option>Loading...</option>}
           {currencies.data?.map((currency) => (
             <option key={currency.code} value={currency.code}>
               {currency.name}
@@ -72,13 +83,17 @@ export default function App() {
         </select>
       </section>
       <section className="flex flex-col items-center justify-between">
-        <span className="text-xl text-center font-medium">
-          {`${Number(amount).toFixed(2)} ${
-            currencies.data?.find((currency) => currency.code === from)?.name
-          } = ${Number(
-            Number(rates.data?.find((rate) => rate.code === to)?.rate!) * Number(amount)
-          ).toFixed(2)} ${currencies.data?.find((currency) => currency.code === to)?.name}`}
-        </span>
+        {currencies.isLoading || rates.isFetching ? (
+          <span className="text-xl text-center font-medium">Loading...</span>
+        ) : (
+          <span className="text-xl text-center font-medium">
+            {`${Number(amount).toFixed(2)} ${
+              currencies.data?.find((currency) => currency.code === from)?.name
+            } = ${Number(
+              Number(rates.data?.find((rate) => rate.code === to)?.rate!) * Number(amount)
+            ).toFixed(2)} ${currencies.data?.find((currency) => currency.code === to)?.name}`}
+          </span>
+        )}
       </section>
     </main>
   );
