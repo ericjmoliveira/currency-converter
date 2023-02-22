@@ -24,7 +24,7 @@ export default function App() {
   return (
     <main
       className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10/12 md:w-1/2 flex 
-    flex-col mx-auto p-8 bg-white"
+    flex-col mx-auto p-8 bg-white rounded-xl"
     >
       <h1 className="text-2xl text-center font-semibold mb-8">Currency Converter</h1>
       <section className="flex flex-col mb-4">
